@@ -1,0 +1,160 @@
+<html>
+
+ <head>
+
+   
+<style>
+  
+  body
+  {
+    font-family: Verdana, sans-serif;
+    
+  }
+  #registered-users
+  {
+        font-family: Verdana, sans-serif;
+    font-size: 12px;
+    padding-top: ;
+  }
+  div
+  {
+
+   background-color: rgb(158, 204, 247);
+   padding: 5px;
+      font-family: Verdana, sans-serif;
+    font-size: 12px
+
+  }
+
+  input
+  {
+    width:500px;
+  }
+  
+#registered-users
+  {
+    padding-top: 8px;
+  }
+   </style>
+  </head>
+
+ <body>
+
+   <div style="width: 700px" >
+   <form action="#" id ="input-form" style="padding: 20px">
+
+   <label for="Name">Name</label></br></br>
+
+   <input type="text" name="name" id = "user-name" required </input></br></br>
+
+     <label for="emailId">e-mail id</label></br></br>
+
+     <input type="email" name="emailID" id = "user-email" required></input></br></br>
+
+
+
+   <label for="phone">Phone </label></br></br>
+
+    <input type="text" name="phone"  id = "user-phone" style="margin-bottom: 10px" required></input></br></br>
+
+
+   <button type="submit" style="background-color: #01498c; color: white; padding: 3px 8px">Submit</button>
+
+   </form>
+
+</div>
+<h5 style="padding-top: 10px">Registered Users:</h5>
+
+  <ol id ="registered-users" >
+    
+  </ol>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+    let inputForm = document.getElementById("input-form");
+
+inputForm.addEventListener("submit", addToStorage);
+
+window.addEventListener("DOMContentLoaded", () => 
+{
+ axios.get("https://crudcrud.com/api/f671debab86f461f812f11f84f986db8/appointmentData").then(res=>{
+ for (let i=0; i<res.data.length; i++)
+    {
+     showItem(res.data[i])
+    }
+  }).catch(err=>{console.log(err)})
+})
+  
+function addToStorage(e)
+{
+  e.preventDefault();
+  let name = e.target.name.value;
+  let emailid = e.target.emailID.value;
+  let phone = e.target.phone.value;
+  let userObj = {                  name: name,
+                                    emailId: emailid,
+                                    phone: phone
+                };
+  
+                                    
+axios.post("https://crudcrud.com/api/f671debab86f461f812f11f84f986db8/appointmentData", userObj).then(res=>{
+  showItem(res.data);
+   
+}).catch(err=>{
+  document.body.innerHTML = document.body.innerHTML + "<p>something went wrong</p>";
+})
+  
+}
+ 
+
+function showItem(user)
+{
+  document.getElementById('user-email').value = '';
+  document.getElementById('user-name').value = '';
+  document.getElementById('user-phone').value ='';
+  if(localStorage.getItem(user.email) !== null)
+  {
+   removeUserFromScreen(user.email);
+    
+  }
+  const parentNode = document.getElementById('registered-users');
+  const childHTML = `<li id=${user._id} style="padding-bottom: 10px"> ${user.name} - ${user.emailId} - ${user.phone}
+                                        <button onclick = deleteUser("${user._id}") style="background-color: #01498c; color: white; padding: 3px 8px"> Delete  </button>
+                                        <button onclick=editUserDetails('${user._id}','${user.name}','${user.phone}','${user.emailId}') style="background-color: #01498c; color: white; padding: 3px 8px">Edit User </button>
+                                     </li>`;
+
+                parentNode.innerHTML = parentNode.innerHTML + childHTML;
+}
+
+
+function editUserDetails(id, name, phone, mail){
+
+                document.getElementById('user-email').value = mail;
+                document.getElementById('user-name').value = name;
+                document.getElementById('user-phone').value = phone;
+
+                deleteUser(id);
+             }
+
+
+function deleteUser(id)
+{
+  axios.delete(`https://crudcrud.com/api/f671debab86f461f812f11f84f986db8/appointmentData/${id}`).then(res=>{console.log(res.data)});
+                
+ removeUserFromScreen(id);
+}
+
+function removeUserFromScreen(id)
+{
+  const parentNode = document.getElementById('registered-users');
+                const childNodeToBeDeleted = document.getElementById(id);
+                if(childNodeToBeDeleted) {
+                    parentNode.removeChild(childNodeToBeDeleted)
+                }
+}
+
+</script>
+</body>
+
+ </html>
