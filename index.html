@@ -76,48 +76,33 @@
 
 inputForm.addEventListener("submit", addToStorage);
 
-window.addEventListener("DOMContentLoaded", () => 
+window.addEventListener("DOMContentLoaded", async () => 
 {
- axios.get("https://crudcrud.com/api/f671debab86f461f812f11f84f986db8/appointmentData").then(res=>{
- for (let i=0; i<res.data.length; i++)
+const usersResponse = await axios.get("https://crudcrud.com/api/932a732d693b4456984d58b0c228b5e0/appointmentData");
+for(let i=0; i<usersResponse.data.length; i++)
     {
-     showItem(res.data[i])
+     showUser(usersResponse.data[i])
     }
-  }).catch(err=>{console.log(err)})
-})
+console.log(usersResponse.data)
+});
   
-function addToStorage(e)
+async function addToStorage(e)
 {
   e.preventDefault();
   let name = e.target.name.value;
-  let emailid = e.target.emailID.value;
+  let emailId = e.target.emailID.value;
   let phone = e.target.phone.value;
-  let userObj = {                  name: name,
-                                    emailId: emailid,
-                                    phone: phone
-                };
-  
-                                    
-axios.post("https://crudcrud.com/api/f671debab86f461f812f11f84f986db8/appointmentData", userObj).then(res=>{
-  showItem(res.data);
-   
-}).catch(err=>{
-  document.body.innerHTML = document.body.innerHTML + "<p>something went wrong</p>";
-})
-  
-}
+  let userObj = {name, emailId, phone};  
+  showUser(userObj);                    
+  await axios.post("https://crudcrud.com/api/932a732d693b4456984d58b0c228b5e0/appointmentData", userObj);
+ }
  
 
-function showItem(user)
+function showUser(user)
 {
   document.getElementById('user-email').value = '';
   document.getElementById('user-name').value = '';
   document.getElementById('user-phone').value ='';
-  if(localStorage.getItem(user.email) !== null)
-  {
-   removeUserFromScreen(user.email);
-    
-  }
   const parentNode = document.getElementById('registered-users');
   const childHTML = `<li id=${user._id} style="padding-bottom: 10px"> ${user.name} - ${user.emailId} - ${user.phone}
                                         <button onclick = deleteUser("${user._id}") style="background-color: #01498c; color: white; padding: 3px 8px"> Delete  </button>
@@ -127,21 +112,20 @@ function showItem(user)
                 parentNode.innerHTML = parentNode.innerHTML + childHTML;
 }
 
-
-function editUserDetails(id, name, phone, mail){
+      async function editUserDetails(id, name, phone, mail){
 
                 document.getElementById('user-email').value = mail;
                 document.getElementById('user-name').value = name;
                 document.getElementById('user-phone').value = phone;
-
-                deleteUser(id);
+                removeUserFromScreen(id);
+                await axios.delete(`https://crudcrud.com/api/932a732d693b4456984d58b0c228b5e0/appointmentData/${id}`);
+                
              }
 
 
-function deleteUser(id)
+async function deleteUser(id)
 {
-  axios.delete(`https://crudcrud.com/api/f671debab86f461f812f11f84f986db8/appointmentData/${id}`).then(res=>{console.log(res.data)});
-                
+ await axios.delete(`https://crudcrud.com/api/932a732d693b4456984d58b0c228b5e0/appointmentData/${id}`);
  removeUserFromScreen(id);
 }
 
